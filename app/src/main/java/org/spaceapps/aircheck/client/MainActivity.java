@@ -2,6 +2,9 @@ package org.spaceapps.aircheck.client;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -20,12 +23,17 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.spaceapps.aircheck.client.sensor.BluetoothConnector;
+import org.spaceapps.aircheck.client.sensor.BluetoothProtocol;
 import org.spaceapps.aircheck.model.LocationDto;
 import org.spaceapps.aircheck.model.SampleDataDto;
 import org.spaceapps.aircheck.model.SampleDto;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,6 +56,10 @@ public class MainActivity extends AppCompatActivity {
 
     private LocationManager locationManager;
     private LocationListener locationListener;
+
+    private Thread bluetoothThread;
+    private InputStream bluetoothStream = null;
+    private BluetoothConnector.BluetoothSocketWrapper bluetoothSocket = null;
 
     @SuppressLint("NewApi")
     @Override
@@ -116,6 +128,70 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
+        if (!ba.isEnabled()) {
+            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOn, 0);
+        }
+
+        bluetoothThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BluetoothProtocol p = new BluetoothProtocol();
+                try {
+                    while (!Thread.interrupted()) {
+                        connectBT();
+                        if (!checkBTConnectivity()) {
+                                Thread.sleep(1000);
+                        } else {
+                            int value = 0;
+                            try {
+                                value = bluetoothStream.read();
+                                if (value < 0) {
+                                    disconnectBT();
+                                } else {
+                                    String data = p.consume(value);
+                                    if (data != null) {
+                                        showToast(data);
+                                    }
+                                }
+                            } catch (IOException ignored) {
+                                disconnectBT();
+                            }
+                        }
+                    }
+                } catch (InterruptedException ignored) {
+                }
+            }
+        });
+        bluetoothThread.start();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try {
+            bluetoothThread.interrupt();
+            bluetoothThread.join();
+        } catch (InterruptedException ignored) {
+        }
+        disconnectBT();
+    }
+
+    private void showToast(final String message) {
+        final Context context = this;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void sendDataToServer() {
 
         Gson gson = new GsonBuilder()
@@ -151,11 +227,48 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void connectBT() {
-
+        if (bluetoothStream != null) return;
+        BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
+        if (!ba.isEnabled()) return;
+        Set<BluetoothDevice> pairedDevices;
+        pairedDevices = ba.getBondedDevices();
+        for (BluetoothDevice device : pairedDevices) {
+            System.err.println(device.getName());
+            if (device.getName().equals("sensor1")) {
+                try {
+                    BluetoothConnector connector = new BluetoothConnector(device, true, ba, null);
+                    bluetoothSocket = connector.connect();
+                    ba.cancelDiscovery();
+                    bluetoothStream = bluetoothSocket.getInputStream();
+                } catch (IOException ignored) {
+                    bluetoothSocket = null;
+                    bluetoothStream = null;
+                }
+                break;
+            }
+        }
     }
 
+    private void disconnectBT() {
+        if (bluetoothStream != null) {
+            try {
+                bluetoothStream.close();
+            } catch (IOException ignored) {
+            }
+            bluetoothStream = null;
+        }
+        if (bluetoothSocket != null) {
+            try {
+                bluetoothSocket.close();
+            } catch (IOException ignored) {
+            }
+            bluetoothSocket = null;
+        }
+    }
+
+
     private boolean checkBTConnectivity() {
-        return false;
+        return bluetoothStream != null;
     }
 
     private void configureButton() {
