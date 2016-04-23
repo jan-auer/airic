@@ -1,7 +1,9 @@
 package org.spaceapps.aircheck.server;
 
+import com.google.android.gcm.server.Sender;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -24,12 +26,15 @@ public class Application {
     }
 
     @Bean
+    public Sender getGcmSender(@Value("${org.spaceapps.aircheck.gcm_key}") String apiKey) {
+        return new Sender(apiKey);
+    }
+
+    @Bean
     public ReloadableResourceBundleMessageSource getMessageSource() {
         final ReloadableResourceBundleMessageSource source = new ReloadableResourceBundleMessageSource();
         source.setFallbackToSystemLocale(false);
-        source.setBasenames(
-                "classpath:common"
-        );
+        source.setBasenames("classpath:common");
 
         if (env.acceptsProfiles("dev")) {
             source.setCacheSeconds(0);
