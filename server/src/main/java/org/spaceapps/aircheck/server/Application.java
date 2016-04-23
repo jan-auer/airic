@@ -11,33 +11,33 @@ import org.springframework.core.env.Environment;
 @SpringBootApplication
 public class Application {
 
-	@Autowired
-	private Environment env;
+    @Autowired
+    private Environment env;
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
 
-	@Bean
-	public ModelMapper getModelMapper() {
-		return new ModelMapper();
-	}
+    @Bean
+    public ModelMapper getModelMapper() {
+        return new ModelMapper();
+    }
 
-	@Bean
-	public ReloadableResourceBundleMessageSource getMessageSource() {
-		final ReloadableResourceBundleMessageSource source = new ReloadableResourceBundleMessageSource();
-		source.setFallbackToSystemLocale(false);
-		source.setBasenames(
-				"classpath:common"
-		);
+    @Bean
+    public ReloadableResourceBundleMessageSource getMessageSource() {
+        final ReloadableResourceBundleMessageSource source = new ReloadableResourceBundleMessageSource();
+        source.setFallbackToSystemLocale(false);
+        source.setBasenames(
+                "classpath:common"
+        );
 
-		if (env.acceptsProfiles("dev")) {
-			source.setCacheSeconds(0);
-		} else {
-			source.setCacheSeconds(-1);
-		}
+        if (env.acceptsProfiles("dev")) {
+            source.setCacheSeconds(0);
+        } else {
+            source.setCacheSeconds(-1);
+        }
 
-		return source;
-	}
+        return source;
+    }
 
 }
