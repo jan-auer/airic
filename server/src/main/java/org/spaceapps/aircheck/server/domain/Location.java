@@ -9,7 +9,7 @@ public class Location {
     private double latitude;
     private double longitude;
     private double altitude;
-    private long accuracy;
+    private double accuracy;
 
     public Location() {
     }
@@ -42,11 +42,11 @@ public class Location {
     }
 
     @Column(name = "location_accuracy")
-    public long getAccuracy() {
+    public double getAccuracy() {
         return accuracy;
     }
 
-    public void setAccuracy(long accuracy) {
+    public void setAccuracy(double accuracy) {
         this.accuracy = accuracy;
     }
 
