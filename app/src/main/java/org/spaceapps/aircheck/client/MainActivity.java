@@ -234,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
         pairedDevices = ba.getBondedDevices();
         for (BluetoothDevice device : pairedDevices) {
             System.err.println(device.getName());
-            if (device.getName().equals("sensor1")) {
+            if (device.getName().equals("sensor1") || device.getName().equals("sensor2")) {
                 try {
                     BluetoothConnector connector = new BluetoothConnector(device, true, ba, null);
                     bluetoothSocket = connector.connect();
