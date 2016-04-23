@@ -5,6 +5,7 @@ import org.spaceapps.aircheck.server.domain.Sample;
 import org.spaceapps.aircheck.server.dto.SampleDto;
 import org.spaceapps.aircheck.server.service.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +30,8 @@ public class SampleController extends BaseApiController {
 
     @Transactional(rollbackFor = Throwable.class, readOnly = true)
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public List<SampleDto> getSamples(@RequestParam(value = "from", required = false) Date from,
-                                      @RequestParam(value = "to", required = false) Date to) {
+    public List<SampleDto> getSamples(@RequestParam(value = "from", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date from,
+                                      @RequestParam(value = "to", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date to) {
         List<Sample> samples = (from == null || to == null)
                 ? sampleService.getSamples()
                 : sampleService.getSamples(from, to);
