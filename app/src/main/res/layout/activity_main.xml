@@ -35,7 +35,8 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="STATUS"
                     android:id="@+id/tv_status"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/white"
+                    android:enabled="true" />
 
             </LinearLayout>
 
@@ -45,12 +46,6 @@
                 android:layout_height="wrap_content"
                 android:gravity="right">
 
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="39dp"
-                    android:text="BT CONNECT"
-                    android:id="@+id/btn_connect"
-                    android:allowUndo="false" />
             </LinearLayout>
 
         </LinearLayout>
@@ -116,7 +111,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="TIMESTAMP"
                     android:id="@+id/tv_timestamp"
                     android:textColor="@android:color/white" />

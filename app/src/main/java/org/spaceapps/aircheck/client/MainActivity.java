@@ -15,7 +15,6 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,20 +34,22 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static okhttp3.logging.HttpLoggingInterceptor.Level.BODY;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final String DATA_URL = "http://169.50.19.146:8080/api/samples";
     public static final String ENDPOINT = "http://169.50.19.146:8080/api/";
 
-    private Button btn_connect;
     private ImageView btn_start;
-    private TextView tv_status;
     private TextView tv_coordinates;
     private TextView tv_accuracy;
     private TextView tv_altitude;
@@ -67,36 +68,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btn_connect = (Button) findViewById(R.id.btn_connect);
         btn_start = (ImageView) findViewById(R.id.btn_start);
-        tv_status = (TextView) findViewById(R.id.tv_status);
         tv_coordinates = (TextView) findViewById(R.id.tv_coordinates);
         tv_accuracy = (TextView) findViewById(R.id.tv_accuracy);
         tv_altitude = (TextView) findViewById(R.id.tv_altitude);
         tv_timestamp = (TextView) findViewById(R.id.tv_timestamp);
-
-        connectBT(); //Connect to Bluetooth device
-
-        parseIncomingData(); //Parse data that is coming from the device and get it ready to send to server
-
-        sendDataToServer();
-
-
-        boolean connected = checkBTConnectivity();
-        if (connected)
-            tv_status.setText("CONNECTED");
-        else
-            tv_status.setText("NOT CONNECTED");
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
 
             @Override
             public void onLocationChanged(Location location) {
-                tv_coordinates.setText("Lon: " + location.getLongitude() + "Lat: " + location.getLatitude());
-                tv_accuracy.setText("Acc: " + location.getAccuracy());
-                tv_altitude.setText("Alt: " + location.getAltitude());
-
+                displayLocationAndTime();
                 //remove comment tags to show Toast notification whenever LocationManager gets new valid coordinates
                 //Toast.makeText(getBaseContext(), "update", Toast.LENGTH_SHORT).show();
             }
@@ -120,9 +103,7 @@ public class MainActivity extends AppCompatActivity {
         btn_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                sendDataToServer();
-                configureButton();
+                displayLocationAndTime();
             }
         });
 
@@ -146,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                     while (!Thread.interrupted()) {
                         connectBT();
                         if (!checkBTConnectivity()) {
-                                Thread.sleep(1000);
+                            Thread.sleep(1000);
                         } else {
                             int value = 0;
                             try {
@@ -154,9 +135,16 @@ public class MainActivity extends AppCompatActivity {
                                 if (value < 0) {
                                     disconnectBT();
                                 } else {
-                                    String data = p.consume(value);
+                                    final String data = p.consume(value);
                                     if (data != null) {
-                                        showToast(data);
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                SampleDto lastSample = createSampleFromReceivedData(data);
+                                                sendDataToServer(lastSample);
+                                            }
+                                        });
+                                        //showToast(data);
                                     }
                                 }
                             } catch (IOException ignored) {
@@ -169,6 +157,39 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         bluetoothThread.start();
+    }
+
+    //DATA in this form: [temp, humidity, co, co2]
+    private SampleDto createSampleFromReceivedData(String data) {
+        SampleDataDto sampleData = new SampleDataDto();
+        LocationDto location = new LocationDto();
+        SampleDto sample = new SampleDto();
+
+        data = data.substring(1, data.length() - 1); //remove brackets
+        String[] values = data.split(",");
+        double temperature = Double.parseDouble(values[0]);
+        double humidity = Double.parseDouble(values[1]);
+        double co = Double.parseDouble(values[2]);
+        double co2 = Double.parseDouble(values[3]);
+
+        sampleData.setTemperature(temperature);
+        sampleData.setHumidity(humidity);
+        sampleData.setCo(co);
+        sampleData.setCo2(co2);
+
+        Location lastKnownLocation = getLastKnownLocation();
+        location.setLatitude(lastKnownLocation.getLatitude());
+        location.setLongitude(lastKnownLocation.getLongitude());
+        location.setAccuracy(lastKnownLocation.getAccuracy());
+        location.setAltitude(lastKnownLocation.getAltitude());
+
+        Date timestamp = getCurrentTimestampFromLocationData(lastKnownLocation);
+        sample.setDeviceId("001");
+        sample.setDate(timestamp);
+        sample.setLocation(location);
+        sample.setData(sampleData);
+
+        return sample;
     }
 
     @Override
@@ -192,22 +213,27 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void sendDataToServer() {
+    private void sendDataToServer(SampleDto sample) {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(BODY);
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
 
         Gson gson = new GsonBuilder()
-                .setDateFormat("yyyy-MM-dd' 'HH:mm")
+                .setDateFormat("yyyy-MM-dd' 'HH:mm:ss")
                 .create();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(ENDPOINT)
                 .addConverterFactory(GsonConverterFactory.create(gson))
-                //.client(builder.build())
+                .client(client)
                 .build();
 
         ServerAPI api = retrofit.create(ServerAPI.class);
-        SampleDto testSample = createDummySample();
 
-        Call<SampleDto> sampleCall = api.postSample(testSample);
+        Call<SampleDto> sampleCall = api.postSample(sample);
         sampleCall.enqueue(new Callback<SampleDto>() {
             @Override
             public void onResponse(Call<SampleDto> call, Response<SampleDto> response) {
@@ -220,10 +246,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Transmission failed", Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    private void parseIncomingData() {
-
     }
 
     private void connectBT() {
@@ -266,51 +288,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     private boolean checkBTConnectivity() {
         return bluetoothStream != null;
     }
 
-    private void configureButton() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-        }
-        //try getting valid GPS Data first
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-        //if no GPS data available -> use network data (less accurate)
-        if (!updateLocationDisplay(lastKnownLocation) && !updateTimeStampDisplay(lastKnownLocation))
-        {
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-            lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            updateLocationDisplay(lastKnownLocation);
-            updateTimeStampDisplay(lastKnownLocation);
-        }
-
+    private void displayLocationAndTime() {
+        Location lastKnownLocation = getLastKnownLocation();
+        if (lastKnownLocation == null)
+            return;
+        updateLocationDisplay(lastKnownLocation);
+        updateTimestampDisplay(lastKnownLocation);
     }
 
-    private SampleDto createDummySample() {
-        LocationDto location = new LocationDto();
-        location.setLongitude(42.555);
-        location.setLatitude(40.444);
-        location.setAccuracy(10);
-        location.setAltitude(100);
-
-        SampleDataDto sampleData = new SampleDataDto();
-        sampleData.setCo(10);
-        sampleData.setCo2(10);
-        sampleData.setHumidity(10);
-        sampleData.setTemperature(35);
-
-        SampleDto sample = new SampleDto();
-        sample.setData(sampleData);
-        sample.setLocation(location);
-        sample.setDate(new Date());
-        sample.setDeviceId("device1");
-
-        return sample;
-    }
     private boolean updateLocationDisplay(Location location) {
         if (location == null)
             return false;
@@ -320,16 +309,40 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private boolean updateTimeStampDisplay(Location location) {
+    private boolean updateTimestampDisplay(Location location) {
         if (location == null)
             return false;
 
-        long tempTime = location.getTime();
-        Date d = new Date(tempTime);
+        Date date = getCurrentTimestampFromLocationData(location);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String timestamp = sdf.format(d);
+        String timestamp = sdf.format(date);
 
         tv_timestamp.setText(timestamp);
         return true;
+    }
+
+    private Location getLastKnownLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+        }
+
+        //try getting valid GPS Data first
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        //if no GPS data available -> use network data (less accurate)
+        if (lastKnownLocation == null) {
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+            lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        }
+
+        return lastKnownLocation;
+    }
+
+    private Date getCurrentTimestampFromLocationData(Location location) {
+
+        long tempTime = location.getTime();
+        Date date = new Date(tempTime);
+        return date;
     }
 }

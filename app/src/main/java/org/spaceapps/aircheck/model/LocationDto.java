@@ -5,7 +5,7 @@ public class LocationDto {
     private double latitude;
     private double longitude;
     private double altitude;
-    private long accuracy;
+    private double accuracy;
 
     public LocationDto() {
     }
@@ -34,11 +34,11 @@ public class LocationDto {
         this.altitude = altitude;
     }
 
-    public long getAccuracy() {
+    public double getAccuracy() {
         return accuracy;
     }
 
-    public void setAccuracy(long accuracy) {
+    public void setAccuracy(double accuracy) {
         this.accuracy = accuracy;
     }
 
