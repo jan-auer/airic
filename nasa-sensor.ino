@@ -29,7 +29,7 @@ void readData() {
 }
 
 void setup() {
-   Serial.begin(9600);
+   Serial.begin(38400);
    Serial.println("nasa-sensor");
 }
 
