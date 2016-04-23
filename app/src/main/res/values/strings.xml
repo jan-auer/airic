@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Aircheck</string>
+    <string name="app_name">Airic</string>
     <string name="gcm_defaultSenderId">588667043586</string>
     <string name="gcm_topic">/topics/air</string>
     <string name="notification_title">How do you feel?</string>
