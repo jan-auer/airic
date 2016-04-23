@@ -35,7 +35,7 @@ public class DemoController {
         return new ModelAndView("demo", model);
     }
 
-    @Transactional(rollbackFor = Throwable.class, readOnly = true)
+    @Transactional(rollbackFor = Throwable.class, readOnly = false)
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ModelAndView push(@RequestParam EventType[] types,
                              ModelMap model,
