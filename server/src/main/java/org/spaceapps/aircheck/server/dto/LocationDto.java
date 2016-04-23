@@ -4,6 +4,7 @@ public class LocationDto {
 
     private double latitude;
     private double longitude;
+    private double altitude;
     private long accuracy;
 
     public LocationDto() {
@@ -23,6 +24,14 @@ public class LocationDto {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public double getAltitude() {
+        return altitude;
+    }
+
+    public void setAltitude(double altitude) {
+        this.altitude = altitude;
     }
 
     public long getAccuracy() {

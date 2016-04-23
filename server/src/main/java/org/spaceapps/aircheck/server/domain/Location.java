@@ -8,6 +8,7 @@ public class Location {
 
     private double latitude;
     private double longitude;
+    private double altitude;
     private long accuracy;
 
     public Location() {
@@ -29,6 +30,15 @@ public class Location {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    @Column(name = "location_alt")
+    public double getAltitude() {
+        return altitude;
+    }
+
+    public void setAltitude(double altitude) {
+        this.altitude = altitude;
     }
 
     @Column(name = "location_accuracy")
