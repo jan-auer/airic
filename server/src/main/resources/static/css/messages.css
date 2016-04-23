@@ -1,0 +1,73 @@
+.messages {
+	position: fixed;
+	right: 0;
+	z-index: 1010;
+}
+
+.message {
+	opacity: 0.5;
+	color: white;
+	padding: 10px 50px 10px 10px;
+	margin: 5px;
+	background: red;
+	position: relative;
+	transition: opacity .25s ease-in-out;
+	-moz-transition: opacity .25s ease-in-out;
+	-webkit-transition: opacity .25s ease-in-out;
+}
+
+.message:hover {
+	opacity: 1;
+}
+
+.message > .fa {
+	line-height: inherit;
+	margin-right: 5px;
+	float: left;
+}
+
+.message a {
+	color: white;
+	cursor: pointer;
+}
+
+.message a:hover {
+	color: white;
+}
+
+.message a {
+	text-decoration: underline;
+}
+
+.message-info {
+	background: #24aa4d;
+}
+
+.message-warning {
+	background: #f5d802;
+}
+
+.message-error {
+	background: #da0e19;
+}
+
+.btn-message-remove {
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 40px;
+	text-align: center;
+	border-left: 1px solid white;
+}
+
+.btn-message-remove:hover {
+	cursor: pointer;
+}
+
+.btn-message-remove > .fa {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}

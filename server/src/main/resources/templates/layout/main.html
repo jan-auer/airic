@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org/extras/dialect">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>aircheck</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <link th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/webjars/font-awesome/4.5.0/css/font-awesome.min.css}" rel="stylesheet" />
+    <link th:href="@{/css/aircheck.css}" rel="stylesheet" />
+    <link th:href="@{/css/messages.css}" rel="stylesheet" />
+    <th:block layout:fragment="styles"></th:block>
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/"><span class="fa fa-calendar-o"></span> aircheck</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li th:classappend="${#httpServletRequest.requestURI.equals('/')}? 'active'">
+                    <a href="/">Dashboard</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="messages" layout:include="fragments/messages :: messages">Messages</div>
+
+<div class="container-fluid">
+    <th:block layout:fragment="content">Content</th:block>
+</div>
+
+<script th:src="@{/webjars/jquery/2.2.3/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/aircheck.js}"></script>
+
+<th:block layout:fragment="script"></th:block>
+</body>
+</html>
