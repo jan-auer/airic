@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -30,15 +31,18 @@ public class DemoController {
     @Transactional(rollbackFor = Throwable.class, readOnly = true)
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ModelAndView index(ModelMap model) {
+        model.addAttribute("types", EventType.values());
         return new ModelAndView("demo", model);
     }
 
     @Transactional(rollbackFor = Throwable.class, readOnly = true)
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ModelAndView push(ModelMap model, RedirectAttributes attributes) {
+    public ModelAndView push(@RequestParam EventType[] types,
+                             ModelMap model,
+                             RedirectAttributes attributes) {
         try {
             Event event = new Event();
-            event.setTypes(Arrays.asList(EventType.HIGH_CO, EventType.HIGH_CO2));
+            event.setTypes(Arrays.asList(types));
             appService.sendEvent(event);
 
             attributes.addFlashAttribute(WebMessage.INFO, "Notification sent.");
