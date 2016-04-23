@@ -15,13 +15,28 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.ada.nasaproxy.R;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import org.spaceapps.aircheck.model.LocationDto;
+import org.spaceapps.aircheck.model.SampleDataDto;
+import org.spaceapps.aircheck.model.SampleDto;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MainActivity extends AppCompatActivity {
+
+    public static final String DATA_URL = "http://169.50.19.146:8080/api/samples";
+    public static final String ENDPOINT = "http://169.50.19.146:8080/api/";
 
     private Button btn_connect;
     private ImageView btn_start;
@@ -47,6 +62,13 @@ public class MainActivity extends AppCompatActivity {
         tv_accuracy = (TextView) findViewById(R.id.tv_accuracy);
         tv_altitude = (TextView) findViewById(R.id.tv_altitude);
         tv_timestamp = (TextView) findViewById(R.id.tv_timestamp);
+
+        connectBT(); //Connect to Bluetooth device
+
+        parseIncomingData(); //Parse data that is coming from the device and get it ready to send to server
+
+        sendDataToServer();
+
 
         boolean connected = checkBTConnectivity();
         if (connected)
@@ -87,9 +109,48 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                sendDataToServer();
                 configureButton();
             }
         });
+
+    }
+
+    private void sendDataToServer() {
+
+        Gson gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd' 'HH:mm")
+                .create();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(ENDPOINT)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                //.client(builder.build())
+                .build();
+
+        ServerAPI api = retrofit.create(ServerAPI.class);
+        SampleDto testSample = createDummySample();
+
+        Call<SampleDto> sampleCall = api.postSample(testSample);
+        sampleCall.enqueue(new Callback<SampleDto>() {
+            @Override
+            public void onResponse(Call<SampleDto> call, Response<SampleDto> response) {
+                Toast.makeText(MainActivity.this, "Transmission succeeded", Toast.LENGTH_LONG).show();
+
+            }
+
+            @Override
+            public void onFailure(Call<SampleDto> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Transmission failed", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void parseIncomingData() {
+
+    }
+
+    private void connectBT() {
 
     }
 
@@ -116,6 +177,27 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private SampleDto createDummySample() {
+        LocationDto location = new LocationDto();
+        location.setLongitude(42.555);
+        location.setLatitude(40.444);
+        location.setAccuracy(10);
+        location.setAltitude(100);
+
+        SampleDataDto sampleData = new SampleDataDto();
+        sampleData.setCo(10);
+        sampleData.setCo2(10);
+        sampleData.setHumidity(10);
+        sampleData.setTemperature(35);
+
+        SampleDto sample = new SampleDto();
+        sample.setData(sampleData);
+        sample.setLocation(location);
+        sample.setDate(new Date());
+        sample.setDeviceId("device1");
+
+        return sample;
+    }
     private boolean updateLocationDisplay(Location location) {
         if (location == null)
             return false;
