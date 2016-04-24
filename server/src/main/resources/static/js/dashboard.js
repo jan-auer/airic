@@ -5,14 +5,15 @@ var mode = 'co2';
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 14,
-        center: {lat: 48.1962812, lng: 16.3687559},
+        zoom: 16,
+        center: {lat: 48.2029932, lng: 16.3719508},
         mapTypeId: google.maps.MapTypeId.ROADMAP
     });
 
     heatmap = new google.maps.visualization.HeatmapLayer({
         dissipating: false,
         data: getData(),
+        radius: 0.005,
         map: map
     });
 
@@ -21,11 +22,17 @@ function initMap() {
 }
 
 function getData() {
+    var min = Infinity, max = -Infinity;
+    for (var i = 0; i < samples.length; i++) {
+        min = Math.min(min, samples[i].data[mode]);
+        max = Math.max(max, samples[i].data[mode]);
+    }
+
     return new google.maps.MVCArray(samples.map(function (sample) {
         var location = sample.location;
         return {
             location: new google.maps.LatLng(location.latitude, location.longitude),
-            weight: (sample.data[mode] - 20) / 20
+            weight: (sample.data[mode] - min) / (max - min)
         };
     }));
 }
