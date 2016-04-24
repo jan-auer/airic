@@ -8,6 +8,19 @@ body {
     background: #eee;
 }
 
+.navbar-default {
+    background-color: rgb(0, 159, 227) !important;
+    color: white !important;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .4);
+}
+
+.navbar-brand {
+    height: 100px;
+    float: none;
+    display: inline-block;
+}
+
 .link-anchor {
     position: relative;
 }
