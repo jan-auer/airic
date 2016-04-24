@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
                                             @Override
                                             public void run() {
                                                 SampleDto lastSample = createSampleFromReceivedData(data);
+                                                displayLocationAndTime();
                                                 sendDataToServer(lastSample);
                                             }
                                         });
@@ -183,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         location.setAccuracy(lastKnownLocation.getAccuracy());
         location.setAltitude(lastKnownLocation.getAltitude());
 
-        Date timestamp = getCurrentTimestampFromLocationData(lastKnownLocation);
+        Date timestamp = getCurrentTimestampFromLocationData();
         sample.setDeviceId("001");
         sample.setDate(timestamp);
         sample.setLocation(location);
@@ -313,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
         if (location == null)
             return false;
 
-        Date date = getCurrentTimestampFromLocationData(location);
+        Date date = getCurrentTimestampFromLocationData();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String timestamp = sdf.format(date);
 
@@ -339,10 +340,8 @@ public class MainActivity extends AppCompatActivity {
         return lastKnownLocation;
     }
 
-    private Date getCurrentTimestampFromLocationData(Location location) {
-
-        long tempTime = location.getTime();
-        Date date = new Date(tempTime);
+    private Date getCurrentTimestampFromLocationData() {
+        Date date = new Date();
         return date;
     }
 }
