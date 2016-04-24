@@ -64,7 +64,7 @@ function updateCircles(symptoms) {
                 lat: location.latitude,
                 lng: location.longitude
             },
-            radius: 240
+            radius: 220
         });
 
         var i = 0;
@@ -72,10 +72,10 @@ function updateCircles(symptoms) {
             if (i++ > 20) {
                 clearInterval(interval);
             } else {
-                circle.set('radius', 240 - i * 10);
-                circle.set('fillOpacity', i * (0.8 / 20));
-                circle.set('strokeOpacity', i * (0.35 / 20));
+                circle.set('radius', 220 - i * 10);
+                circle.set('fillOpacity', i * (0.35 / 20));
+                circle.set('strokeOpacity', i * (0.8 / 20));
             }
         }, 50);
-    }, 250);
+    }, 500);
 }
