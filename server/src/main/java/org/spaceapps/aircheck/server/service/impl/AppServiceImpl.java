@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 
 import static java.util.stream.Collectors.joining;
 
@@ -48,6 +50,16 @@ public class AppServiceImpl implements AppService {
         }
 
         return eventRepository.save(event);
+    }
+
+    @Override
+    public List<SymptomOccurrence> getSymptoms() {
+        return symptomOccurrenceRepository.findAll();
+    }
+
+    @Override
+    public List<SymptomOccurrence> getSymptoms(Date from, Date to) {
+        return symptomOccurrenceRepository.findByTimespan(from, to);
     }
 
     @Override

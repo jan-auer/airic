@@ -1,6 +1,5 @@
 package org.spaceapps.aircheck.server.dto;
 
-import org.spaceapps.aircheck.server.domain.Location;
 import org.spaceapps.aircheck.server.domain.Symptom;
 
 import java.util.Date;
@@ -8,7 +7,7 @@ import java.util.Date;
 public class SymptomOccurrenceDto {
 
     private Symptom symptom;
-    private Location location;
+    private LocationDto location;
     private Date date;
 
     public SymptomOccurrenceDto() {
@@ -22,11 +21,11 @@ public class SymptomOccurrenceDto {
         this.symptom = symptom;
     }
 
-    public Location getLocation() {
+    public LocationDto getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(LocationDto location) {
         this.location = location;
     }
 
@@ -37,5 +36,4 @@ public class SymptomOccurrenceDto {
     public void setDate(Date date) {
         this.date = date;
     }
-
 }

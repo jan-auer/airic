@@ -36,11 +36,11 @@ public class SymptomOccurrence {
         this.symptom = symptom;
     }
 
+    @Embedded
     public Location getLocation() {
         return location;
     }
 
-    @Embedded
     public void setLocation(Location location) {
         this.location = location;
     }
