@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org/extras/dialect"
+      layout:decorator="layout/main">
+<th:block layout:fragment="styles">
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet"/>
+</th:block>
+<body>
+<th:block layout:fragment="content">
+    <div id="map"></div>
+</th:block>
+<th:block layout:fragment="script">
+    <script th:src="@{/js/dashboard.js}"></script>
+    <script th:src="@{https://maps.googleapis.com/maps/api/js?key=AIzaSyCcPZ3h6J1-2jGmXY29r94GMrdITusvCxE&amp;libraries=visualization&amp;callback=initMap}"></script>
+</th:block>
+</body>
+</html>
