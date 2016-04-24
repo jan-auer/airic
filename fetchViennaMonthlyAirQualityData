@@ -1,0 +1,11 @@
+#this script downloads the monthly air quality reports of the City of Vienna from 2006 to 2015
+
+url="https://www.wien.gv.at/umwelt/luft/pdf/luftguete20"
+
+for j in $(seq -f "%02g" 13 16)
+do
+  for i in $(seq -f "%02g" 1 12)
+  do
+    curl "$url$j$i.pdf" > "$j$i.pdf"
+  done
+done
