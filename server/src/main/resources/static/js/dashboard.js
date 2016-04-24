@@ -25,7 +25,7 @@ function getData() {
         var location = sample.location;
         return {
             location: new google.maps.LatLng(location.latitude, location.longitude),
-            weight: sample.data[mode]
+            weight: (sample.data[mode] - 20) / 20
         };
     }));
 }
