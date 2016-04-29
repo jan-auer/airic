@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "588667043586",
+    "project_id": "aircheck-6f714"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:588667043586:android:3d2af78d240e0607",
+        "android_client_info": {
+          "package_name": "org.spaceapps.aircheck.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2reeorpdYM3Ghv5rxlf0zA1Ns_JllRuQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
