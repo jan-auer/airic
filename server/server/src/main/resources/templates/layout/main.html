@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org/extras/dialect">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>aircheck</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <link th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/webjars/font-awesome/4.5.0/css/font-awesome.min.css}" rel="stylesheet" />
+    <link th:href="@{/css/aircheck.css}" rel="stylesheet" />
+    <link th:href="@{/css/messages.css}" rel="stylesheet" />
+    <th:block layout:fragment="styles"></th:block>
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <a class="navbar-brand" href="/">
+        <img src="/img/airic.png" alt="airic" style="height: 100%; max-height: 100%" />
+    </a>
+</nav>
+
+<div class="messages" layout:include="fragments/messages :: messages">Messages</div>
+
+<th:block layout:fragment="content">Content</th:block>
+
+<script th:src="@{/webjars/jquery/2.2.3/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/aircheck.js}"></script>
+
+<th:block layout:fragment="script"></th:block>
+</body>
+</html>

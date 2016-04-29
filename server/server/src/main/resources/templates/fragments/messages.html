@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.thymeleaf.org/extras/dialect">
+<body>
+<div layout:fragment="messages">
+    <div class="message message-info" th:if="${infoMessage != null}">
+        <span class="fa fa-info-circle"></span>
+        <span th:utext="${infoMessage}"></span>
+
+        <div class="btn-message-remove"><span class="fa fa-close"></span></div>
+    </div>
+
+    <div class="message message-info" th:each="infoMessageEntry : ${infoMessageList}">
+        <span class="fa fa-info-circle"></span>
+        <span th:utext="${infoMessageEntry}"></span>
+
+        <div class="btn-message-remove"><span class="fa fa-close"></span></div>
+    </div>
+
+    <div class="message message-warning" th:if="${warningMessage != null}">
+        <span class="fa fa-info-circle"></span>
+        <span th:utext="${warningMessage}"></span>
+
+        <div class="btn-message-remove"><span class="fa fa-close"></span></div>
+    </div>
+
+    <div class="message message-warning" th:each="warningMessageEntry : ${warningMessageList}">
+        <span class="fa fa-info-circle"></span>
+        <span th:utext="${warningMessageEntry}"></span>
+
+        <div class="btn-message-remove"><span class="fa fa-close"></span></div>
+    </div>
+
+    <div class="message message-error" th:if="${errorMessage != null}">
+        <span class="fa fa-info-circle"></span>
+        <span th:utext="${errorMessage}"></span>
+
+        <div class="btn-message-remove"><span class="fa fa-close"></span></div>
+    </div>
+
+    <div class="message message-error" th:each="errorMessageEntry : ${errorMessageList}">
+        <span class="fa fa-info-circle"></span>
+        <span th:utext="${errorMessageEntry}"></span>
+
+        <div class="btn-message-remove"><span class="fa fa-close"></span></div>
+    </div>
+
+</div>
+</body>
+</html>
