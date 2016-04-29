@@ -12,5 +12,5 @@ Our target is combining symptom data of respiratory deseases with geolocation-ta
 
 At the challenge, we have built a 3d-printed measurement case with sensors and mounted it on a quadcopter drone and a bike.
 We also built a data science platform and connected it to weather and air quality data in Vienna and abroad.
-Lastly, we created an Adroid app for patients to track their symptoms.
+Lastly, we created an Android app for patients to track their symptoms.
 
